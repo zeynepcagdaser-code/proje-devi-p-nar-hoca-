@@ -1275,37 +1275,28 @@ with gizem_tab:
 
     try:
         if aleyna_generated_df is None:
-            raise ValueError("Aleyna adımı üretilemediği için Gizem adımı başlatılamadı.")
+            raise ValueError("Aleyna adımı üretilemediği için özellik çıkarımı başlatılamadı.")
         gizem_labeled_df = gizem_generated_df if gizem_generated_df is not None else run_gizem_pipeline(aleyna_generated_df)[0]
         gizem_feature_table = gizem_features_df if gizem_features_df is not None else run_gizem_pipeline(aleyna_generated_df)[1]
 
-        st.success("Gizem adımı tamamlandı.")
+        st.success("Özellik çıkarımı tamamlandı.")
         st.write("Global özellik tablosu:")
         st.dataframe(gizem_feature_table, use_container_width=True)
         feature_plot_df = gizem_feature_table.transpose().reset_index()
         feature_plot_df.columns = ["Ozellik", "Deger"]
         fig_feat, ax_feat = plt.subplots(figsize=(10, 4))
         ax_feat.plot(feature_plot_df["Ozellik"], feature_plot_df["Deger"], marker="o", linewidth=2)
-        ax_feat.set_title("Gizem - Ozellik Dagilimi")
+        ax_feat.set_title("Ozellik Dagilimi")
         ax_feat.set_xlabel("Ozellik")
         ax_feat.set_ylabel("Deger")
         ax_feat.tick_params(axis="x", rotation=45)
         ax_feat.grid(axis="y")
         st.pyplot(fig_feat)
 
-        st.write("Gizem etiketlenmiş veri önizlemesi:")
+        st.write("Etiketlenmiş veri önizlemesi:")
         st.dataframe(gizem_labeled_df.head(20), use_container_width=True)
-        if "label" in gizem_labeled_df.columns:
-            label_counts = gizem_labeled_df["label"].astype(str).value_counts()
-            fig_lbl, ax_lbl = plt.subplots(figsize=(6, 4))
-            ax_lbl.plot(label_counts.index, label_counts.values, marker="o", linewidth=2)
-            ax_lbl.set_title("Gizem - Etiket Dagilimi")
-            ax_lbl.set_xlabel("Etiket")
-            ax_lbl.set_ylabel("Adet")
-            ax_lbl.grid(axis="y")
-            st.pyplot(fig_lbl)
     except Exception as exc:
-        st.error(f"Gizem adımı çalıştırılamadı: {exc}")
+        st.error(f"Özellik çıkarımı çalıştırılamadı: {exc}")
 
 with live_tab:
     st.subheader("Canlı Tahmin Paneli")
