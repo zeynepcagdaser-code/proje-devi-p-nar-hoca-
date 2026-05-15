@@ -1333,9 +1333,6 @@ with live_tab:
         active_feature = config["feature_column"]
         active_window_size = int(config["window_size"])
 
-        st.write("Aktif model:")
-        st.json(config)
-
         if active_feature not in model_training_df.columns:
             st.error(f"Aktif model {active_feature} sütununu bekliyor, ancak bu CSV içinde yok.")
         else:
