@@ -1258,8 +1258,8 @@ if not is_uploaded_mode:
                 st.error(f"Simay adimi calistirilamadi: {exc}")
 
 with aleyna_tab:
-    st.subheader("Aleyna Sayfası - Filtreleme")
-    st.write("Yüklenen veride Aleyna'nın görevi uygulanır: `delta_lambda_noisy` için hareketli ortalama filtreleme (window=15).")
+    st.subheader("Sinyal İşleme & Filtreleme")
+    st.write("Gürültü temizleme (Denoising) ve optik sinyali AI için hazır hale getirme.")
 
     try:
         if simay_generated_df is None:
