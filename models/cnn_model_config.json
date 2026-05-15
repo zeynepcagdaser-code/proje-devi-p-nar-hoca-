@@ -1,0 +1,38 @@
+{
+    "model_type": "1D-CNN",
+    "feature_column": "delta_lambda_filtered",
+    "label_column": "label",
+    "window_size": 16,
+    "stride": 1,
+    "feature_count": 1,
+    "class_names": [
+        "mild_damage",
+        "normal",
+        "severe_damage"
+    ],
+    "source": "fbg_simulink_unlabeled_dataset.csv",
+    "scaling": "MinMaxScaler",
+    "seed": 42,
+    "recipe_version": "v3_recipe_search",
+    "best_recipe": "high_capacity_low_lr",
+    "recipe_results": [
+        {
+            "name": "stable_balanced",
+            "val_macro_f1": 1.0,
+            "val_loss_min": 0.09175833314657211,
+            "best_epoch": 34
+        },
+        {
+            "name": "high_capacity_low_lr",
+            "val_macro_f1": 0.9937672928498618,
+            "val_loss_min": 0.07384056597948074,
+            "best_epoch": 28
+        },
+        {
+            "name": "balanced_plus_low_lr",
+            "val_macro_f1": 0.9935250667923935,
+            "val_loss_min": 0.0967317521572113,
+            "best_epoch": 34
+        }
+    ]
+}

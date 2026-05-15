@@ -1,0 +1,47 @@
+{
+    "model_type": "LSTM",
+    "feature_column": "delta_lambda_filtered",
+    "label_column": "label",
+    "window_size": 32,
+    "stride": 2,
+    "feature_count": 1,
+    "class_names": [
+        "mild_damage",
+        "normal",
+        "severe_damage"
+    ],
+    "source": "fbg_simulink_unlabeled_dataset.csv",
+    "scaling": "StandardScaler",
+    "seed": 42,
+    "recipe_version": "v1_recipe_search",
+    "best_recipe": "lstm_w32_s2_e50",
+    "recipe_results": [
+        {
+            "name": "lstm_w16_s2_e40",
+            "window_size": 16,
+            "stride": 2,
+            "epochs": 40,
+            "val_macro_f1": 0.9743589743589745,
+            "val_loss_min": 0.05100002884864807,
+            "best_epoch": 23
+        },
+        {
+            "name": "lstm_w32_s2_e50",
+            "window_size": 32,
+            "stride": 2,
+            "epochs": 50,
+            "val_macro_f1": 1.0,
+            "val_loss_min": 0.00810866616666317,
+            "best_epoch": 39
+        },
+        {
+            "name": "lstm_w48_s4_e60",
+            "window_size": 48,
+            "stride": 4,
+            "epochs": 60,
+            "val_macro_f1": 1.0,
+            "val_loss_min": 0.04575122520327568,
+            "best_epoch": 24
+        }
+    ]
+}
