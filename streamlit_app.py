@@ -855,7 +855,7 @@ with lstm_tab:
         st.info("Henüz kayıtlı LSTM modeli bulunamadı. Önce LSTM modelini eğitip kaydet.")
 
 with cnn_tab:
-    st.subheader("1D-CNN Model Eğitimi")
+    st.subheader("CNN Model Eğitimi")
     st.write(
         "CNN eğitim akışı sabit seed, sabit split ve en iyi model checkpoint'i ile daha stabil çalışacak şekilde ayarlandı."
     )
