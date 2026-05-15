@@ -1342,7 +1342,7 @@ with live_tab:
 
             prediction_mode = st.radio(
                 "Tahmin veri kaynağı",
-                ["CSV i?indeki son ?l??mler", "Tahmin i?in yeni CSV y?kle", "Manuel de?er gir"],
+                ["CSV içindeki son ölçümler", "Tahmin için yeni CSV yükle", "Manuel değer gir"],
                 horizontal=True,
             )
 
@@ -1366,7 +1366,7 @@ with live_tab:
                         st.dataframe(probability_df, use_container_width=True)
 
             elif "yeni CSV" in prediction_mode:
-                prediction_file = st.file_uploader("Tahmin i?in CSV y?kle", type=["csv"], key="live_prediction_csv")
+                prediction_file = st.file_uploader("Tahmin için CSV yükle", type=["csv"], key="live_prediction_csv")
                 if prediction_file is not None:
                     try:
                         prediction_df = pd.read_csv(prediction_file)
