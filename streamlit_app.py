@@ -1216,12 +1216,11 @@ if not is_uploaded_mode:
         if is_uploaded_mode:
             st.info("Disaridan etiketli veri geldi")
         else:
-            st.subheader("Simay Sayfasi - Simulink ve Etiketli Ham Veri")
-            st.write("Simay adimi ham sinyali etiketler. Etiketlenmis cikti Aleyna adimina aktarilir.")
+            st.subheader("Fiziksel Modelleme & Donanım")
+            st.write("FBG sensör yapısı, Bragg kayması ve fiziksel simülasyon parametreleri.")
 
             try:
                 simay_df = simay_generated_df if simay_generated_df is not None else run_simay_pipeline(df, force_relabel=False)
-                st.success("Simay adimi goruntulendi.")
 
                 s_col1, s_col2, s_col3 = st.columns(3)
                 s_col1.metric("Kayit Sayisi", int(len(simay_df)))
