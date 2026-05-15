@@ -1342,11 +1342,11 @@ with live_tab:
 
             prediction_mode = st.radio(
                 "Tahmin veri kaynağı",
-                ["CSV icindeki son olcumler", "Tahmin icin yeni CSV yukle", "Manuel deger gir"],
+                ["CSV i?indeki son ?l??mler", "Tahmin i?in yeni CSV y?kle", "Manuel de?er gir"],
                 horizontal=True,
             )
 
-            if prediction_mode == "CSV içindeki son ölçümler":
+            if prediction_mode.startswith("CSV"):
                 if len(model_training_df) < active_window_size:
                     st.error("CSV, modelin beklediği pencere boyutundan kısa.")
                 else:
@@ -1365,8 +1365,8 @@ with live_tab:
                         )
                         st.dataframe(probability_df, use_container_width=True)
 
-            elif prediction_mode == "Tahmin icin yeni CSV yukle":
-                prediction_file = st.file_uploader("Tahmin icin CSV yukle", type=["csv"], key="live_prediction_csv")
+            elif "yeni CSV" in prediction_mode:
+                prediction_file = st.file_uploader("Tahmin i?in CSV y?kle", type=["csv"], key="live_prediction_csv")
                 if prediction_file is not None:
                     try:
                         prediction_df = pd.read_csv(prediction_file)
