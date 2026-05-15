@@ -1215,11 +1215,6 @@ if not is_uploaded_mode:
             try:
                 simay_df = simay_generated_df if simay_generated_df is not None else run_simay_pipeline(df, force_relabel=False)
 
-                s_col1, s_col2, s_col3 = st.columns(3)
-                s_col1.metric("Kayit Sayisi", int(len(simay_df)))
-                s_col2.metric("Sutun Sayisi", int(len(simay_df.columns)))
-                s_col3.metric("Sinif Sayisi", int(simay_df["label"].nunique()))
-
                 simay_rows = st.slider("Gosterilecek satir sayisi (Simay)", 5, min(len(simay_df), 100), 20)
                 simay_max_start = max(len(simay_df) - simay_rows, 0)
                 simay_start = st.slider("Baslangic satiri (Simay)", 0, simay_max_start, 0)
