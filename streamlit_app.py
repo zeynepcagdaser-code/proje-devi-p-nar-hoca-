@@ -1282,9 +1282,28 @@ with gizem_tab:
         st.success("Gizem adımı tamamlandı.")
         st.write("Global özellik tablosu:")
         st.dataframe(gizem_feature_table, use_container_width=True)
+        feature_plot_df = gizem_feature_table.transpose().reset_index()
+        feature_plot_df.columns = ["Ozellik", "Deger"]
+        fig_feat, ax_feat = plt.subplots(figsize=(10, 4))
+        ax_feat.bar(feature_plot_df["Ozellik"], feature_plot_df["Deger"])
+        ax_feat.set_title("Gizem - Ozellik Dagilimi")
+        ax_feat.set_xlabel("Ozellik")
+        ax_feat.set_ylabel("Deger")
+        ax_feat.tick_params(axis="x", rotation=45)
+        ax_feat.grid(axis="y")
+        st.pyplot(fig_feat)
 
         st.write("Gizem etiketlenmiş veri önizlemesi:")
         st.dataframe(gizem_labeled_df.head(20), use_container_width=True)
+        if "label" in gizem_labeled_df.columns:
+            label_counts = gizem_labeled_df["label"].astype(str).value_counts()
+            fig_lbl, ax_lbl = plt.subplots(figsize=(6, 4))
+            ax_lbl.bar(label_counts.index, label_counts.values)
+            ax_lbl.set_title("Gizem - Etiket Dagilimi")
+            ax_lbl.set_xlabel("Etiket")
+            ax_lbl.set_ylabel("Adet")
+            ax_lbl.grid(axis="y")
+            st.pyplot(fig_lbl)
     except Exception as exc:
         st.error(f"Gizem adımı çalıştırılamadı: {exc}")
 
