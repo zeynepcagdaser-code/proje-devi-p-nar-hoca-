@@ -510,7 +510,7 @@ try:
         df, data_source = load_dataset(uploaded_file)
         validate_raw_upload_columns(df)
         if "label" not in df.columns:
-            st.error("Makine ??renimi i?in y?klenen veride `label` s?tunu zorunludur.")
+            st.error("Makine ogrenimi icin yuklenen veride `label` sutunu zorunludur.")
             st.stop()
     else:
         df, data_source = load_dataset(None)
@@ -548,9 +548,9 @@ except Exception as exc:
 
 if uploaded_missing_label and simay_generated_df is not None:
     labeled_csv_bytes = simay_generated_df.to_csv(index=False).encode("utf-8")
-    st.sidebar.success("Y?klenen veri etiketlendi ve Aleyna ad?m? i?in haz?r.")
+    st.sidebar.success("Yuklenen veri etiketlendi ve Aleyna adimi icin hazir.")
     st.sidebar.download_button(
-        "Etiketli CSV ?ndir",
+        "Etiketli CSV Indir",
         data=labeled_csv_bytes,
         file_name="uploaded_labeled_by_simay.csv",
         mime="text/csv",
@@ -599,7 +599,7 @@ if is_uploaded_mode:
     col1, col2, col3 = st.columns(3)
     col1.metric("Satir Sayisi", len(summary_df))
     col2.metric("Sutun Sayisi", len(summary_df.columns))
-    col3.metric("Y?klenen Dosyada Etiket Var m??", "Evet" if uploaded_has_label_raw else "Hay?r")
+    col3.metric("Yuklenen Dosyada Etiket Var mi?", "Evet" if uploaded_has_label_raw else "Hayir")
 else:
     col1, col2 = st.columns(2)
     col1.metric("Satir Sayisi", len(summary_df))
@@ -636,15 +636,15 @@ with overview_tab:
     st.caption(f"Gösterilen aralık: {start_row} - {end_row - 1} / Toplam satır: {len(model_training_df)}")
     st.dataframe(model_training_df.iloc[start_row:end_row], use_container_width=True)
 
-    st.subheader("Sinyal Grafi?i")
+    st.subheader("Sinyal Grafigi")
     overview_graph_df = df if is_uploaded_mode else (simay_generated_df if simay_generated_df is not None else df)
     overview_feature_candidates = ["delta_lambda_noisy", "delta_lambda_simulink", feature_column]
     overview_feature = next((column for column in overview_feature_candidates if column in overview_graph_df.columns), None)
     if overview_feature is not None:
         st.pyplot(plot_signal(overview_graph_df, overview_feature))
-        st.caption(f"Grafikte g?sterilen kaynak s?tun: {overview_feature}")
+        st.caption(f"Grafikte gosterilen kaynak sutun: {overview_feature}")
     else:
-        st.info("Grafik i?in uygun sinyal s?tunu bulunamad?.")
+        st.info("Grafik icin uygun sinyal sutunu bulunamadi.")
 
     if show_label_distribution:
         st.subheader("Etiket Dağılımı")
@@ -1214,25 +1214,25 @@ with compare_tab:
 if not is_uploaded_mode:
     with simay_tab:
         if is_uploaded_mode:
-            st.info("D??ar?dan etiketli veri geldi")
+            st.info("Disaridan etiketli veri geldi")
         else:
-            st.subheader("Simay Sayfas? - Simulink ve Etiketli Ham Veri")
-            st.write("Simay ad?m? ham sinyali etiketler. Etiketlenmi? ??kt? Aleyna ad?m?na aktar?l?r.")
+            st.subheader("Simay Sayfasi - Simulink ve Etiketli Ham Veri")
+            st.write("Simay adimi ham sinyali etiketler. Etiketlenmis cikti Aleyna adimina aktarilir.")
 
             try:
                 simay_df = simay_generated_df if simay_generated_df is not None else run_simay_pipeline(df, force_relabel=False)
-                st.success("Simay ad?m? g?r?nt?lendi.")
+                st.success("Simay adimi goruntulendi.")
 
                 s_col1, s_col2, s_col3 = st.columns(3)
-                s_col1.metric("Kay?t Say?s?", int(len(simay_df)))
-                s_col2.metric("S?tun Say?s?", int(len(simay_df.columns)))
-                s_col3.metric("S?n?f Say?s?", int(simay_df["label"].nunique()))
+                s_col1.metric("Kayit Sayisi", int(len(simay_df)))
+                s_col2.metric("Sutun Sayisi", int(len(simay_df.columns)))
+                s_col3.metric("Sinif Sayisi", int(simay_df["label"].nunique()))
 
-                simay_rows = st.slider("G?sterilecek sat?r say?s? (Simay)", 5, min(len(simay_df), 100), 20)
+                simay_rows = st.slider("Gosterilecek satir sayisi (Simay)", 5, min(len(simay_df), 100), 20)
                 simay_max_start = max(len(simay_df) - simay_rows, 0)
-                simay_start = st.slider("Ba?lang?? sat?r? (Simay)", 0, simay_max_start, 0)
+                simay_start = st.slider("Baslangic satiri (Simay)", 0, simay_max_start, 0)
                 simay_end = min(simay_start + simay_rows, len(simay_df))
-                st.caption(f"Simay aral???: {simay_start} - {simay_end - 1} / Toplam sat?r: {len(simay_df)}")
+                st.caption(f"Simay araligi: {simay_start} - {simay_end - 1} / Toplam satir: {len(simay_df)}")
                 st.dataframe(simay_df.iloc[simay_start:simay_end], use_container_width=True)
 
                 fig1, ax1 = plt.subplots(figsize=(12, 4))
@@ -1249,14 +1249,14 @@ if not is_uploaded_mode:
                 fig2, ax2 = plt.subplots(figsize=(6, 4))
                 label_counts = simay_df["label"].value_counts()
                 ax2.bar(label_counts.index, label_counts.values)
-                ax2.set_title("Simay - Etiket Da??l?m?")
+                ax2.set_title("Simay - Etiket Dagilimi")
                 ax2.set_xlabel("Label")
                 ax2.set_ylabel("Adet")
                 ax2.grid(axis="y")
                 st.pyplot(fig2)
                 st.dataframe(label_counts.rename("adet"), use_container_width=True)
             except Exception as exc:
-                st.error(f"Simay ad?m? ?al??t?r?lamad?: {exc}")
+                st.error(f"Simay adimi calistirilamadi: {exc}")
 
 with aleyna_tab:
     st.subheader("Aleyna Sayfası - Filtreleme")
@@ -1338,7 +1338,7 @@ with live_tab:
 
             prediction_mode = st.radio(
                 "Tahmin veri kaynağı",
-                ["CSV i?indeki son ?l??mler", "Tahmin i?in yeni CSV y?kle", "Manuel de?er gir"],
+                ["CSV icindeki son olcumler", "Tahmin icin yeni CSV yukle", "Manuel deger gir"],
                 horizontal=True,
             )
 
@@ -1361,39 +1361,39 @@ with live_tab:
                         )
                         st.dataframe(probability_df, use_container_width=True)
 
-            elif prediction_mode == "Tahmin i?in yeni CSV y?kle":
-                prediction_file = st.file_uploader("Tahmin i?in CSV y?kle", type=["csv"], key="live_prediction_csv")
+            elif prediction_mode == "Tahmin icin yeni CSV yukle":
+                prediction_file = st.file_uploader("Tahmin icin CSV yukle", type=["csv"], key="live_prediction_csv")
                 if prediction_file is not None:
                     try:
                         prediction_df = pd.read_csv(prediction_file)
                     except Exception as exc:
-                        st.error(f"Y?klenen tahmin CSV dosyas? okunamad?: {exc}")
+                        st.error(f"Yuklenen tahmin CSV dosyasi okunamadi: {exc}")
                         prediction_df = None
 
                     if prediction_df is not None:
                         if active_feature not in prediction_df.columns:
                             st.error(
-                                f"Y?klenen tahmin verisinde `{active_feature}` s?tunu yok. "
-                                "Model bu s?tunu bekliyor."
+                                f"Yuklenen tahmin verisinde `{active_feature}` sutunu yok. "
+                                "Model bu sutunu bekliyor."
                             )
                         else:
                             prediction_signal = pd.to_numeric(prediction_df[active_feature], errors="coerce").dropna()
                             if len(prediction_signal) < active_window_size:
                                 st.error(
-                                    f"Y?klenen tahmin verisi en az {active_window_size} de?er i?ermeli. "
-                                    f"Bulunan ge?erli de?er say?s?: {len(prediction_signal)}"
+                                    f"Yuklenen tahmin verisi en az {active_window_size} deger icermeli. "
+                                    f"Bulunan gecerli deger sayisi: {len(prediction_signal)}"
                                 )
                             else:
                                 latest_values = prediction_signal.tail(active_window_size).values
                                 st.line_chart(pd.DataFrame({active_feature: latest_values}))
-                                if st.button("Y?klenen Veriyle Tahmin Et"):
+                                if st.button("Yuklenen Veriyle Tahmin Et"):
                                     predicted_label, confidence, probabilities = predict_window(latest_values)
                                     st.success(f"Tahmin: {predicted_label}")
-                                    st.metric("G?ven", round(confidence, 4))
+                                    st.metric("Guven", round(confidence, 4))
                                     probability_df = pd.DataFrame(
                                         {
-                                            "s?n?f": st.session_state["active_encoder"].classes_,
-                                            "olas?l?k": probabilities,
+                                            "sinif": st.session_state["active_encoder"].classes_,
+                                            "olasilik": probabilities,
                                         }
                                     )
                                     st.dataframe(probability_df, use_container_width=True)
