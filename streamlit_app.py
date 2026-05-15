@@ -1257,23 +1257,23 @@ with aleyna_tab:
 
     try:
         if simay_generated_df is None:
-            raise ValueError("Simay adımı üretilemediği için Aleyna adımı başlatılamadı.")
+            raise ValueError("Önceki adım üretilemediği için filtreleme başlatılamadı.")
         aleyna_df = aleyna_generated_df if aleyna_generated_df is not None else run_aleyna_pipeline(simay_generated_df, window_size=15)
-        st.success("Aleyna adımı tamamlandı.")
+        st.success("Filtreleme tamamlandı.")
         st.dataframe(aleyna_df.head(20), use_container_width=True)
 
         fig, ax = plt.subplots(figsize=(12, 4))
         x_axis = aleyna_df["time"] if "time" in aleyna_df.columns else aleyna_df.index
         ax.plot(x_axis, aleyna_df["delta_lambda_noisy"], label="Noisy Signal", alpha=0.45)
         ax.plot(x_axis, aleyna_df["delta_lambda_filtered"], label="Filtered Signal", linewidth=2)
-        ax.set_title("Aleyna - FBG Signal Filtering")
+        ax.set_title("FBG Signal Filtering")
         ax.set_xlabel("Time")
         ax.set_ylabel("Delta Lambda")
         ax.grid(True)
         ax.legend()
         st.pyplot(fig)
     except Exception as exc:
-        st.error(f"Aleyna adımı çalıştırılamadı: {exc}")
+        st.error(f"Filtreleme çalıştırılamadı: {exc}")
 
 with gizem_tab:
     st.subheader("Özellik Çıkarımı (Feature Engineering)")
