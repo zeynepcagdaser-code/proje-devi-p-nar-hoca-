@@ -660,8 +660,7 @@ with lstm_tab:
     if lstm_image_path.exists():
         st.image(str(lstm_image_path), use_container_width=True)
     st.write(
-        "LSTM, zaman serisindeki ardışık ölçümler arasındaki ilişkiyi öğrenir. "
-        "Bu bölüm mevcut panelindeki RNN/LSTM tabanlı hasar sınıflandırma akışıdır."
+        "LSTM, zaman serisindeki ardışık ölçümler arasındaki ilişkiyi öğrenir."
     )
 
     lstm_train_disabled = not has_label or len(model_training_df) <= lstm_window_size
