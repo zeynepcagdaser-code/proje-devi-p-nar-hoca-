@@ -590,6 +590,12 @@ st.sidebar.caption(
 )
 
 
+flow_image_path = PROJECT_DIR / "assets" / "akis_semasi.png"
+if flow_image_path.exists():
+    st.image(str(flow_image_path), use_container_width=True)
+else:
+    st.info("Akis gorseli bulunamadi. `assets/akis_semasi.png` yoluna ekleyebilirsin.")
+
 if is_uploaded_mode:
     summary_df = df
 else:
@@ -617,11 +623,6 @@ else:
 
 with overview_tab:
     st.subheader("Makine Öğrenimi Veri Görüntüleme")
-    flow_image_path = PROJECT_DIR / "assets" / "akis_semasi.png"
-    if flow_image_path.exists():
-        st.image(str(flow_image_path), use_container_width=True)
-    else:
-        st.info("Ak?? g?rseli bulunamad?. `assets/akis_semasi.png` yoluna ekleyebilirsin.")
     preview_rows = st.slider("Gösterilecek satır sayısı", 5, min(len(model_training_df), 100), 20)
     max_start = max(len(model_training_df) - preview_rows, 0)
     start_row = st.slider("Başlangıç satırı", 0, max_start, 0)
