@@ -605,18 +605,6 @@ else:
     col1.metric("Satir Sayisi", len(summary_df))
     col2.metric("Sutun Sayisi", len(summary_df.columns))
 
-if gizem_generated_df is not None:
-    source_text = f"Gizem çıktısı (Simay -> Aleyna -> Gizem) | Kaynak: {source_label(data_source)}"
-else:
-    source_text = str(data_source)
-st.caption(f"Kullanılan veri: {source_text}")
-if pipeline_output_paths is not None:
-    st.caption(
-        "Pipeline çıktıları kaydedildi: "
-        f"{pipeline_output_paths[0].name}, {pipeline_output_paths[1].name}, "
-        f"{pipeline_output_paths[2].name}, {pipeline_output_paths[3].name}"
-    )
-
 if is_uploaded_mode:
     overview_tab, aleyna_tab, gizem_tab, lstm_tab, cnn_tab, compare_tab, live_tab = st.tabs(
         ["Veri İnceleme", "Sinyal İşleme Filtreleme", "Özellik Çıkarımı (Feature Engineering)", "LSTM Eğitimi", "CNN Eğitimi", "Adil Karşılaştırma", "Canlı Tahmin"]
@@ -629,6 +617,10 @@ else:
 
 with overview_tab:
     st.subheader("Makine Öğrenimi Veri Görüntüleme")
+    st.markdown("""
+**Ak?? ?emas?**
+`Veri Kayna??` ? `Simay (Etiketleme)` ? `Aleyna (Filtreleme)` ? `Gizem (?zellik ??kar?m?)` ? `LSTM/CNN E?itimi` ? `Adil Kar??la?t?rma` ? `Canl? Tahmin`
+""")
     preview_rows = st.slider("Gösterilecek satır sayısı", 5, min(len(model_training_df), 100), 20)
     max_start = max(len(model_training_df) - preview_rows, 0)
     start_row = st.slider("Başlangıç satırı", 0, max_start, 0)
