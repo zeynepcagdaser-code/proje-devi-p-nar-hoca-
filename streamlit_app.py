@@ -1212,44 +1212,41 @@ with compare_tab:
 
 if not is_uploaded_mode:
     with simay_tab:
-        if is_uploaded_mode:
-            st.info("Disaridan etiketli veri geldi")
-        else:
-            st.subheader("Fiziksel Modelleme & Donanım")
-            st.write("FBG sensör yapısı, Bragg kayması ve fiziksel simülasyon parametreleri.")
+        st.subheader("Fiziksel Modelleme & Donan?m")
+        st.write("FBG sens?r yap?s?, Bragg kaymas? ve fiziksel sim?lasyon parametreleri.")
 
-            try:
-                simay_df = simay_generated_df if simay_generated_df is not None else run_simay_pipeline(df, force_relabel=False)
+        try:
+            simay_df = simay_generated_df if simay_generated_df is not None else run_simay_pipeline(df, force_relabel=False)
 
-                simay_rows = st.slider("Gosterilecek satir sayisi", 5, min(len(simay_df), 100), 20)
-                simay_max_start = max(len(simay_df) - simay_rows, 0)
-                simay_start = st.slider("Baslangic satiri", 0, simay_max_start, 0)
-                simay_end = min(simay_start + simay_rows, len(simay_df))
-                st.caption(f"Gosterilen aralik: {simay_start} - {simay_end - 1} / Toplam satir: {len(simay_df)}")
-                st.dataframe(simay_df.iloc[simay_start:simay_end], use_container_width=True)
+            simay_rows = st.slider("Gosterilecek satir sayisi", 5, min(len(simay_df), 100), 20, key="simay_rows")
+            simay_max_start = max(len(simay_df) - simay_rows, 0)
+            simay_start = st.slider("Baslangic satiri", 0, simay_max_start, 0, key="simay_start")
+            simay_end = min(simay_start + simay_rows, len(simay_df))
+            st.caption(f"Gosterilen aralik: {simay_start} - {simay_end - 1} / Toplam satir: {len(simay_df)}")
+            st.dataframe(simay_df.iloc[simay_start:simay_end], use_container_width=True)
 
-                fig1, ax1 = plt.subplots(figsize=(12, 4))
-                if "delta_lambda_simulink" in simay_df.columns:
-                    ax1.plot(simay_df["time"], simay_df["delta_lambda_simulink"], label="Simulink Signal", linewidth=2)
-                ax1.plot(simay_df["time"], simay_df["delta_lambda_noisy"], label="Noisy Signal", alpha=0.65)
-                ax1.set_title("Etiketlenen Ham Sinyal")
-                ax1.set_xlabel("Time")
-                ax1.set_ylabel("Delta Lambda")
-                ax1.grid(True)
-                ax1.legend()
-                st.pyplot(fig1)
+            fig1, ax1 = plt.subplots(figsize=(12, 4))
+            if "delta_lambda_simulink" in simay_df.columns:
+                ax1.plot(simay_df["time"], simay_df["delta_lambda_simulink"], label="Simulink Signal", linewidth=2)
+            ax1.plot(simay_df["time"], simay_df["delta_lambda_noisy"], label="Noisy Signal", alpha=0.65)
+            ax1.set_title("Etiketlenen Ham Sinyal")
+            ax1.set_xlabel("Time")
+            ax1.set_ylabel("Delta Lambda")
+            ax1.grid(True)
+            ax1.legend()
+            st.pyplot(fig1)
 
-                fig2, ax2 = plt.subplots(figsize=(6, 4))
-                label_counts = simay_df["label"].value_counts()
-                ax2.bar(label_counts.index, label_counts.values)
-                ax2.set_title("Etiket Dagilimi")
-                ax2.set_xlabel("Label")
-                ax2.set_ylabel("Adet")
-                ax2.grid(axis="y")
-                st.pyplot(fig2)
-                st.dataframe(label_counts.rename("adet"), use_container_width=True)
-            except Exception as exc:
-                st.error(f"Sayfa verisi calistirilamadi: {exc}")
+            fig2, ax2 = plt.subplots(figsize=(6, 4))
+            label_counts = simay_df["label"].value_counts()
+            ax2.bar(label_counts.index, label_counts.values)
+            ax2.set_title("Etiket Dagilimi")
+            ax2.set_xlabel("Label")
+            ax2.set_ylabel("Adet")
+            ax2.grid(axis="y")
+            st.pyplot(fig2)
+            st.dataframe(label_counts.rename("adet"), use_container_width=True)
+        except Exception as exc:
+            st.error(f"Sayfa verisi calistirilamadi: {exc}")
 
 with aleyna_tab:
     st.subheader("Sinyal İşleme & Filtreleme")
