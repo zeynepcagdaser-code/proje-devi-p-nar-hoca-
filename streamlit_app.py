@@ -1282,8 +1282,8 @@ with aleyna_tab:
         st.error(f"Aleyna adımı çalıştırılamadı: {exc}")
 
 with gizem_tab:
-    st.subheader("Gizem Sayfası - Özellik Çıkarımı")
-    st.write("Gizem sayfası, Aleyna çıktısını işler, etiketleri sayısallaştırır ve özellik setini hazırlar.")
+    st.subheader("Özellik Çıkarımı (Feature Engineering)")
+    st.write("Veriyi sayısallaştırma, tepe noktası analizi ve veri setini etiketleme.")
 
     try:
         if aleyna_generated_df is None:
