@@ -1285,7 +1285,7 @@ with gizem_tab:
         feature_plot_df = gizem_feature_table.transpose().reset_index()
         feature_plot_df.columns = ["Ozellik", "Deger"]
         fig_feat, ax_feat = plt.subplots(figsize=(10, 4))
-        ax_feat.bar(feature_plot_df["Ozellik"], feature_plot_df["Deger"])
+        ax_feat.plot(feature_plot_df["Ozellik"], feature_plot_df["Deger"], marker="o", linewidth=2)
         ax_feat.set_title("Gizem - Ozellik Dagilimi")
         ax_feat.set_xlabel("Ozellik")
         ax_feat.set_ylabel("Deger")
@@ -1298,7 +1298,7 @@ with gizem_tab:
         if "label" in gizem_labeled_df.columns:
             label_counts = gizem_labeled_df["label"].astype(str).value_counts()
             fig_lbl, ax_lbl = plt.subplots(figsize=(6, 4))
-            ax_lbl.bar(label_counts.index, label_counts.values)
+            ax_lbl.plot(label_counts.index, label_counts.values, marker="o", linewidth=2)
             ax_lbl.set_title("Gizem - Etiket Dagilimi")
             ax_lbl.set_xlabel("Etiket")
             ax_lbl.set_ylabel("Adet")
