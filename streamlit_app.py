@@ -656,6 +656,9 @@ with overview_tab:
 
 with lstm_tab:
     st.subheader("LSTM Model Eğitimi")
+    lstm_image_path = PROJECT_DIR / "assets" / "lstm_akisi.png"
+    if lstm_image_path.exists():
+        st.image(str(lstm_image_path), use_container_width=True)
     st.write(
         "LSTM, zaman serisindeki ardışık ölçümler arasındaki ilişkiyi öğrenir. "
         "Bu bölüm mevcut panelindeki RNN/LSTM tabanlı hasar sınıflandırma akışıdır."
