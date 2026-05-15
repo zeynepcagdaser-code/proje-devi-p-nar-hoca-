@@ -599,7 +599,7 @@ if is_uploaded_mode:
     col1, col2, col3 = st.columns(3)
     col1.metric("Satir Sayisi", len(summary_df))
     col2.metric("Sutun Sayisi", len(summary_df.columns))
-    col3.metric("Yuklenen Dosyada Etiket Var mi?", "Evet" if uploaded_has_label_raw else "Hayir")
+    col3.metric("Y?klenen Dosyada Etiket Var m??", "Evet" if uploaded_has_label_raw else "Hay?r")
 else:
     col1, col2 = st.columns(2)
     col1.metric("Satir Sayisi", len(summary_df))
