@@ -622,7 +622,13 @@ else:
 
 
 with overview_tab:
-    st.dataframe(model_training_df, use_container_width=True)
+    preview_rows = st.slider("Gosterilecek satir sayisi", 5, min(len(model_training_df), 100), 20)
+    max_start = max(len(model_training_df) - preview_rows, 0)
+    start_row = st.slider("Baslangic satiri", 0, max_start, 0)
+    end_row = min(start_row + preview_rows, len(model_training_df))
+    st.caption(f"Gosterilen aralik: {start_row} - {end_row - 1} / Toplam satir: {len(model_training_df)}")
+    st.dataframe(model_training_df.iloc[start_row:end_row], use_container_width=True)
+
 
     st.subheader("Sinyal Grafigi")
     overview_graph_df = df if is_uploaded_mode else (simay_generated_df if simay_generated_df is not None else df)
@@ -1288,8 +1294,13 @@ with gizem_tab:
         ax_feat.grid(axis="y")
         st.pyplot(fig_feat)
 
-        st.write("Etiketlenmiş veri önizlemesi:")
-        st.dataframe(gizem_labeled_df.head(20), use_container_width=True)
+        st.write("Etiketlenmis veri:")
+        gizem_rows = st.slider("Gosterilecek satir sayisi (Ozellik Cikarimi)", 5, min(len(gizem_labeled_df), 100), 20)
+        gizem_max_start = max(len(gizem_labeled_df) - gizem_rows, 0)
+        gizem_start = st.slider("Baslangic satiri (Ozellik Cikarimi)", 0, gizem_max_start, 0)
+        gizem_end = min(gizem_start + gizem_rows, len(gizem_labeled_df))
+        st.caption(f"Ozellik Cikarimi araligi: {gizem_start} - {gizem_end - 1} / Toplam satir: {len(gizem_labeled_df)}")
+        st.dataframe(gizem_labeled_df.iloc[gizem_start:gizem_end], use_container_width=True)
     except Exception as exc:
         st.error(f"Özellik çıkarımı çalıştırılamadı: {exc}")
 
