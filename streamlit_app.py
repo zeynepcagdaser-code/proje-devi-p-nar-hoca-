@@ -623,7 +623,7 @@ if is_uploaded_mode:
     )
 else:
     overview_tab, simay_tab, aleyna_tab, gizem_tab, lstm_tab, cnn_tab, compare_tab, live_tab = st.tabs(
-        ["Veri İnceleme", "Simulink ve Etiketli Ham Veri", "Filtreleme", "Özellik Çıkarımı", "LSTM Eğitimi", "CNN Eğitimi", "Adil Karşılaştırma", "Canlı Tahmin"]
+        ["Veri İnceleme", "Fiziksel Modelleme ve Donanım", "Filtreleme", "Özellik Çıkarımı", "LSTM Eğitimi", "CNN Eğitimi", "Adil Karşılaştırma", "Canlı Tahmin"]
     )
 
 
