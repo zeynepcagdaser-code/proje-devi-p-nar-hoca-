@@ -1336,10 +1336,6 @@ with live_tab:
         if active_feature not in model_training_df.columns:
             st.error(f"Aktif model {active_feature} sütununu bekliyor, ancak bu CSV içinde yok.")
         else:
-            st.write(
-                f"{model_type} modeli son {active_window_size} ölçümü kullanarak tahmin yapacak."
-            )
-
             prediction_mode = st.radio(
                 "Tahmin veri kaynağı",
                 ["CSV içindeki son ölçümler", "Tahmin için yeni CSV yükle", "Manuel değer gir"],
