@@ -622,7 +622,6 @@ else:
 
 
 with overview_tab:
-    st.subheader("Makine Öğrenimi Veri Görüntüleme")
     preview_rows = st.slider("Gösterilecek satır sayısı", 5, min(len(model_training_df), 100), 20)
     max_start = max(len(model_training_df) - preview_rows, 0)
     start_row = st.slider("Başlangıç satırı", 0, max_start, 0)
