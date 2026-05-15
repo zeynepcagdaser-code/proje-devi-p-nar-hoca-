@@ -618,12 +618,12 @@ if pipeline_output_paths is not None:
     )
 
 if is_uploaded_mode:
-    overview_tab, aleyna_tab, gizem_tab, lstm_tab, cnn_tab, analysis_tab, compare_tab, live_tab = st.tabs(
-        ["Veri İnceleme", "Sinyal İşleme Filtreleme", "Özellik Çıkarımı (Feature Engineering)", "LSTM Eğitimi", "CNN Eğitimi", "Hasar Tespiti & Analiz", "Adil Karşılaştırma", "Canlı Tahmin"]
+    overview_tab, aleyna_tab, gizem_tab, lstm_tab, cnn_tab, compare_tab, live_tab = st.tabs(
+        ["Veri İnceleme", "Sinyal İşleme Filtreleme", "Özellik Çıkarımı (Feature Engineering)", "LSTM Eğitimi", "CNN Eğitimi", "Adil Karşılaştırma", "Canlı Tahmin"]
     )
 else:
-    overview_tab, simay_tab, aleyna_tab, gizem_tab, lstm_tab, cnn_tab, analysis_tab, compare_tab, live_tab = st.tabs(
-        ["Veri İnceleme", "Fiziksel Modelleme ve Donanım", "Sinyal İşleme Filtreleme", "Özellik Çıkarımı (Feature Engineering)", "LSTM Eğitimi", "CNN Eğitimi", "Hasar Tespiti & Analiz", "Adil Karşılaştırma", "Canlı Tahmin"]
+    overview_tab, simay_tab, aleyna_tab, gizem_tab, lstm_tab, cnn_tab, compare_tab, live_tab = st.tabs(
+        ["Veri İnceleme", "Fiziksel Modelleme ve Donanım", "Sinyal İşleme Filtreleme", "Özellik Çıkarımı (Feature Engineering)", "LSTM Eğitimi", "CNN Eğitimi", "Adil Karşılaştırma", "Canlı Tahmin"]
     )
 
 
@@ -1048,54 +1048,6 @@ with cnn_tab:
             y_test=y_test,
             y_pred=y_pred,
         )
-
-with analysis_tab:
-    st.subheader("Hasar Tespiti & Analiz")
-    st.write("Model sonuçlarının yorumlanması ve hasar teşhis mantığının kurulması.")
-
-    if not active_model_ready():
-        st.info("Analiz için önce LSTM veya CNN modelini tahmin için aktif et.")
-    else:
-        model_type = st.session_state["active_model_type"]
-        config = st.session_state["active_config"]
-        active_feature = config["feature_column"]
-        active_window_size = int(config["window_size"])
-
-        if active_feature not in model_training_df.columns:
-            st.warning(f"Aktif modelin beklediği `{active_feature}` sütunu analiz verisinde bulunamadı.")
-        elif len(model_training_df) < active_window_size:
-            st.warning(f"Analiz için en az {active_window_size} ölçüm gerekli.")
-        else:
-            latest_values = model_training_df[active_feature].tail(active_window_size).values
-            predicted_label, confidence, probabilities = predict_window(latest_values)
-
-            col_a, col_b, col_c = st.columns(3)
-            col_a.metric("Aktif Model", model_type)
-            col_b.metric("Tahmin Edilen Sınıf", predicted_label)
-            col_c.metric("Güven Skoru", round(float(confidence), 4))
-
-            if confidence >= 0.85:
-                st.success("Teşhis güveni yüksek: model çıktısı karar destek için güçlü görünüyor.")
-            elif confidence >= 0.65:
-                st.warning("Teşhis güveni orta: ek ölçüm veya uzman doğrulaması önerilir.")
-            else:
-                st.error("Teşhis güveni düşük: karar vermeden önce yeni ölçüm alınmalı.")
-
-            if predicted_label == "severe_damage":
-                st.error("Hasar teşhisi: Ciddi hasar olasılığı yüksek.")
-            elif predicted_label == "mild_damage":
-                st.warning("Hasar teşhisi: Hafif hasar belirtileri mevcut.")
-            else:
-                st.info("Hasar teşhisi: Normal çalışma davranışı.")
-
-            st.write("Sınıf olasılık dağılımı:")
-            probability_df = pd.DataFrame(
-                {
-                    "sınıf": st.session_state["active_encoder"].classes_,
-                    "olasılık": probabilities,
-                }
-            )
-            st.dataframe(probability_df, use_container_width=True)
 
 with compare_tab:
     st.subheader("LSTM vs CNN (Aynı Koşullarda)")
