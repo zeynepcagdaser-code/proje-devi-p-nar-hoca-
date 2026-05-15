@@ -1272,7 +1272,7 @@ with aleyna_tab:
 
 with gizem_tab:
     st.subheader("Özellik Çıkarımı (Feature Engineering)")
-    st.write("Veriyi sayısallaştırma, tepe noktası analizi ve veri setini etiketleme.")
+    st.write("Veriyi sayısallaştırma, tepe noktası analizi.")
 
     try:
         if aleyna_generated_df is None:
