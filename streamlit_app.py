@@ -618,8 +618,12 @@ else:
 with overview_tab:
     st.subheader("Makine Öğrenimi Veri Görüntüleme")
     st.markdown("""
-**Ak?? ?emas?**
-`Veri Kayna??` ? `Simay (Etiketleme)` ? `Aleyna (Filtreleme)` ? `Gizem (?zellik ??kar?m?)` ? `LSTM/CNN E?itimi` ? `Adil Kar??la?t?rma` ? `Canl? Tahmin`
+**Algoritma Akisi**
+1. Disaridan veri yuklendi mi?
+   - Evet -> Yuklenen veri Aleyna adimina gider -> Gizem adimina aktarilir -> Makine ogrenmesi (LSTM/CNN) bu veriyle calisir.
+   - Hayir -> Simay'in hazir verisi kullanilir -> Aleyna adimina gider -> Gizem adimina aktarilir -> Makine ogrenmesi (LSTM/CNN) bu veriyle calisir.
+2. Model egitimi tamamlanir.
+3. Adil karsilastirma ve canli tahmin adimlari calistirilir.
 """)
     preview_rows = st.slider("Gösterilecek satır sayısı", 5, min(len(model_training_df), 100), 20)
     max_start = max(len(model_training_df) - preview_rows, 0)
