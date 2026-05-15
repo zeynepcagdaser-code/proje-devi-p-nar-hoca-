@@ -1347,7 +1347,6 @@ with live_tab:
                     st.error("CSV, modelin beklediği pencere boyutundan kısa.")
                 else:
                     latest_values = model_training_df[active_feature].tail(active_window_size).values
-                    st.line_chart(pd.DataFrame({active_feature: latest_values}))
 
                     if st.button("Son Ölçümlerle Tahmin Et"):
                         predicted_label, confidence, probabilities = predict_window(latest_values)
@@ -1385,7 +1384,6 @@ with live_tab:
                                 )
                             else:
                                 latest_values = prediction_signal.tail(active_window_size).values
-                                st.line_chart(pd.DataFrame({active_feature: latest_values}))
                                 if st.button("Yuklenen Veriyle Tahmin Et"):
                                     predicted_label, confidence, probabilities = predict_window(latest_values)
                                     st.success(f"Tahmin: {predicted_label}")
