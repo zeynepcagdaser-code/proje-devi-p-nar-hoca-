@@ -856,6 +856,9 @@ with lstm_tab:
 
 with cnn_tab:
     st.subheader("CNN Model Eğitimi")
+    cnn_image_path = PROJECT_DIR / "assets" / "cnn_akisi.png"
+    if cnn_image_path.exists():
+        st.image(str(cnn_image_path), use_container_width=True)
     st.write(
         "CNN eğitim akışı sabit seed, sabit split ve en iyi model checkpoint'i ile daha stabil çalışacak şekilde ayarlandı."
     )
