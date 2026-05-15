@@ -1337,8 +1337,7 @@ with live_tab:
             st.error(f"Aktif model {active_feature} sütununu bekliyor, ancak bu CSV içinde yok.")
         else:
             st.write(
-                f"{model_type} modeli son {active_window_size} ölçümü kullanarak tahmin yapacak. "
-                f"Kullanılan sütun: {active_feature}"
+                f"{model_type} modeli son {active_window_size} ölçümü kullanarak tahmin yapacak."
             )
 
             prediction_mode = st.radio(
