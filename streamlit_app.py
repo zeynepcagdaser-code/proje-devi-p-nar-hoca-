@@ -617,14 +617,11 @@ else:
 
 with overview_tab:
     st.subheader("Makine Öğrenimi Veri Görüntüleme")
-    st.markdown("""
-**Algoritma Akisi**
-1. Disaridan veri yuklendi mi?
-   - Evet -> Yuklenen veri Aleyna adimina gider -> Gizem adimina aktarilir -> Makine ogrenmesi (LSTM/CNN) bu veriyle calisir.
-   - Hayir -> Simay'in hazir verisi kullanilir -> Aleyna adimina gider -> Gizem adimina aktarilir -> Makine ogrenmesi (LSTM/CNN) bu veriyle calisir.
-2. Model egitimi tamamlanir.
-3. Adil karsilastirma ve canli tahmin adimlari calistirilir.
-""")
+    flow_image_path = PROJECT_DIR / "assets" / "akis_semasi.png"
+    if flow_image_path.exists():
+        st.image(str(flow_image_path), use_container_width=True)
+    else:
+        st.info("Ak?? g?rseli bulunamad?. `assets/akis_semasi.png` yoluna ekleyebilirsin.")
     preview_rows = st.slider("Gösterilecek satır sayısı", 5, min(len(model_training_df), 100), 20)
     max_start = max(len(model_training_df) - preview_rows, 0)
     start_row = st.slider("Başlangıç satırı", 0, max_start, 0)
