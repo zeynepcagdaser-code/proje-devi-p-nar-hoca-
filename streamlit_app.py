@@ -612,12 +612,12 @@ else:
     col2.metric("Sutun Sayisi", len(summary_df.columns))
 
 if is_uploaded_mode:
-    overview_tab, aleyna_tab, gizem_tab, lstm_tab, cnn_tab, compare_tab, live_tab = st.tabs(
-        ["Veri İnceleme", "Sinyal İşleme Filtreleme", "Özellik Çıkarımı (Feature Engineering)", "LSTM Eğitimi", "CNN Eğitimi", "Adil Karşılaştırma", "Canlı Tahmin"]
+    overview_tab, aleyna_tab, gizem_tab, cnn_tab, lstm_tab, compare_tab, live_tab = st.tabs(
+        ["Veri İnceleme", "Sinyal İşleme Filtreleme", "Özellik Çıkarımı (Feature Engineering)", "CNN Eğitimi", "LSTM Eğitimi", "Adil Karşılaştırma", "Canlı Tahmin"]
     )
 else:
-    overview_tab, simay_tab, aleyna_tab, gizem_tab, lstm_tab, cnn_tab, compare_tab, live_tab = st.tabs(
-        ["Veri İnceleme", "Fiziksel Modelleme ve Donanım", "Sinyal İşleme Filtreleme", "Özellik Çıkarımı (Feature Engineering)", "LSTM Eğitimi", "CNN Eğitimi", "Adil Karşılaştırma", "Canlı Tahmin"]
+    overview_tab, simay_tab, aleyna_tab, gizem_tab, cnn_tab, lstm_tab, compare_tab, live_tab = st.tabs(
+        ["Veri İnceleme", "Fiziksel Modelleme ve Donanım", "Sinyal İşleme Filtreleme", "Özellik Çıkarımı (Feature Engineering)", "CNN Eğitimi", "LSTM Eğitimi", "Adil Karşılaştırma", "Canlı Tahmin"]
     )
 
 
