@@ -1381,7 +1381,13 @@ with gizem_tab:
         axes_feat[0].grid(True, alpha=0.3)
         axes_feat[0].legend(loc="best")
 
-        axes_feat[1].plot(x_for_plot, encoded_labels, color="#1f77b4", linewidth=2)
+        axes_feat[1].plot(
+            x_for_plot,
+            encoded_labels,
+            color="#1f77b4",
+            linewidth=1.2,
+            drawstyle="steps-post",
+        )
         axes_feat[1].set_title("Encoded Damage Labels")
         axes_feat[1].set_yticks([0, 1, 2])
         axes_feat[1].set_yticklabels(["Normal", "Mild", "Severe"])
