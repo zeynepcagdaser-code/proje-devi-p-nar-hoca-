@@ -1385,6 +1385,7 @@ with gizem_tab:
             change_points = np.where(np.diff(encoded_labels) != 0)[0] + 1
             segment_starts = np.r_[0, change_points]
             segment_ends = np.r_[change_points, len(encoded_labels)]
+            class_colors = {0: "#2ca02c", 1: "#1f77b4", 2: "#d62728"}
             for start_idx, end_idx in zip(segment_starts, segment_ends):
                 if end_idx - start_idx <= 0:
                     continue
@@ -1395,7 +1396,7 @@ with gizem_tab:
                     y=y_val,
                     xmin=x_start,
                     xmax=x_end,
-                    colors="#1f77b4",
+                    colors=class_colors.get(int(y_val), "#1f77b4"),
                     linewidth=2.2,
                 )
         axes_feat[1].set_title("Encoded Damage Labels")
