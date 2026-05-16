@@ -1295,14 +1295,30 @@ with gizem_tab:
         x_for_plot = np.asarray(x_axis)[valid_signal]
         signal_for_plot = signal_values[valid_signal]
 
-        if len(signal_for_plot) >= 3:
-            peak_mask = (
-                (signal_for_plot[1:-1] > signal_for_plot[:-2])
-                & (signal_for_plot[1:-1] > signal_for_plot[2:])
+        if len(signal_for_plot) >= 7:
+            smooth_window = max(5, int(len(signal_for_plot) * 0.01))
+            if smooth_window % 2 == 0:
+                smooth_window += 1
+            kernel = np.ones(smooth_window, dtype=float) / smooth_window
+            smoothed_signal = np.convolve(signal_for_plot, kernel, mode="same")
+
+            candidate_mask = (
+                (smoothed_signal[1:-1] > smoothed_signal[:-2])
+                & (smoothed_signal[1:-1] > smoothed_signal[2:])
             )
-            peak_indices = np.where(peak_mask)[0] + 1
-            if len(peak_indices) > 30:
-                peak_indices = peak_indices[:30]
+            candidate_indices = np.where(candidate_mask)[0] + 1
+
+            dynamic_threshold = np.percentile(smoothed_signal, 75)
+            candidate_indices = candidate_indices[smoothed_signal[candidate_indices] >= dynamic_threshold]
+
+            min_distance = max(8, len(smoothed_signal) // 20)
+            selected_peaks = []
+            for idx in candidate_indices:
+                if not selected_peaks or (idx - selected_peaks[-1]) >= min_distance:
+                    selected_peaks.append(int(idx))
+                elif smoothed_signal[idx] > smoothed_signal[selected_peaks[-1]]:
+                    selected_peaks[-1] = int(idx)
+            peak_indices = np.array(selected_peaks, dtype=int)
         else:
             peak_indices = np.array([], dtype=int)
 
