@@ -1212,8 +1212,8 @@ with compare_tab:
 
 if not is_uploaded_mode:
     with simay_tab:
-        st.subheader("Fiziksel Modelleme & Donan?m")
-        st.write("FBG sens?r yap?s?, Bragg kaymas? ve fiziksel sim?lasyon parametreleri.")
+        st.subheader("Fiziksel Modelleme ve Donanım")
+        st.write("FBG sensör yapısı, Bragg kayması ve fiziksel simülasyon parametreleri.")
 
         try:
             simay_df = simay_generated_df if simay_generated_df is not None else run_simay_pipeline(df, force_relabel=False)
