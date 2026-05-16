@@ -1324,10 +1324,56 @@ with gizem_tab:
         else:
             peak_indices = np.array([], dtype=int)
 
-        label_series = gizem_labeled_df["label"].astype(str).str.strip().str.lower()
-        label_code_map = {"normal": 0, "mild_damage": 1, "severe_damage": 2}
-        encoded_labels = label_series.map(label_code_map).fillna(1).to_numpy(dtype=int)
-        encoded_labels = encoded_labels[valid_signal]
+        valley_indices = np.array([], dtype=int)
+        if len(signal_for_plot) >= 3:
+            valley_candidate_mask = (
+                (signal_for_plot[1:-1] < signal_for_plot[:-2])
+                & (signal_for_plot[1:-1] < signal_for_plot[2:])
+            )
+            valley_candidates = np.where(valley_candidate_mask)[0] + 1
+
+            valley_prominence_threshold = 0.15
+            valid_valleys = []
+            for idx in valley_candidates:
+                prominence = min(signal_for_plot[idx - 1], signal_for_plot[idx + 1]) - signal_for_plot[idx]
+                if prominence >= valley_prominence_threshold:
+                    valid_valleys.append(int(idx))
+
+            min_valley_distance_time = 30.0
+            selected_valleys = []
+            for idx in valid_valleys:
+                if not selected_valleys:
+                    selected_valleys.append(idx)
+                    continue
+                if abs(x_for_plot[idx] - x_for_plot[selected_valleys[-1]]) >= min_valley_distance_time:
+                    selected_valleys.append(idx)
+                elif signal_for_plot[idx] < signal_for_plot[selected_valleys[-1]]:
+                    selected_valleys[-1] = idx
+            valley_indices = np.array(selected_valleys, dtype=int)
+
+        label_mode = st.radio(
+            "Encoded etiket kaynağı",
+            ["Etikete göre göster", "Sinyalden türet"],
+            horizontal=True,
+            key="gizem_label_mode",
+        )
+
+        if label_mode == "Etikete göre göster":
+            label_series = gizem_labeled_df["label"].astype(str).str.strip().str.lower()
+            label_code_map = {"normal": 0, "mild_damage": 1, "severe_damage": 2}
+            encoded_labels = label_series.map(label_code_map).fillna(1).to_numpy(dtype=int)
+            encoded_labels = encoded_labels[valid_signal]
+        else:
+            encoded_labels = np.ones(len(signal_for_plot), dtype=int)  # mild
+            band = max(2, len(signal_for_plot) // 120)
+            for p_idx in peak_indices:
+                left = max(0, p_idx - band)
+                right = min(len(encoded_labels), p_idx + band + 1)
+                encoded_labels[left:right] = 2  # severe
+            for v_idx in valley_indices:
+                left = max(0, v_idx - band)
+                right = min(len(encoded_labels), v_idx + band + 1)
+                encoded_labels[left:right] = 0  # normal
 
         fig_feat, axes_feat = plt.subplots(2, 1, figsize=(11, 8), sharex=True)
         axes_feat[0].plot(x_for_plot, signal_for_plot, color="#1f77b4", linewidth=1.8, label="Filtrelenmis Sinyal")
@@ -1338,6 +1384,15 @@ with gizem_tab:
                 color="red",
                 s=34,
                 label="Tepe Noktalari",
+                zorder=3,
+            )
+        if len(valley_indices) > 0:
+            axes_feat[0].scatter(
+                x_for_plot[valley_indices],
+                signal_for_plot[valley_indices],
+                color="green",
+                s=30,
+                label="Cukur Noktalari",
                 zorder=3,
             )
         axes_feat[0].set_title("Peak Detection")
