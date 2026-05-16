@@ -1357,7 +1357,23 @@ with gizem_tab:
         encoded_labels = encoded_labels[valid_signal]
 
         fig_feat, axes_feat = plt.subplots(2, 1, figsize=(11, 8), sharex=True)
-        axes_feat[0].plot(x_for_plot, signal_for_plot, color="#1f77b4", linewidth=1.8, label="Filtrelenmis Sinyal")
+        class_colors = {0: "#2ca02c", 1: "#1f77b4", 2: "#d62728"}
+        if len(encoded_labels) > 0:
+            change_points_top = np.where(np.diff(encoded_labels) != 0)[0] + 1
+            segment_starts_top = np.r_[0, change_points_top]
+            segment_ends_top = np.r_[change_points_top, len(encoded_labels)]
+            for start_idx, end_idx in zip(segment_starts_top, segment_ends_top):
+                if end_idx - start_idx <= 1:
+                    continue
+                cls = int(encoded_labels[start_idx])
+                axes_feat[0].plot(
+                    x_for_plot[start_idx:end_idx],
+                    signal_for_plot[start_idx:end_idx],
+                    color=class_colors.get(cls, "#1f77b4"),
+                    linewidth=1.8,
+                )
+        else:
+            axes_feat[0].plot(x_for_plot, signal_for_plot, color="#1f77b4", linewidth=1.8)
         if len(peak_indices) > 0:
             axes_feat[0].scatter(
                 x_for_plot[peak_indices],
@@ -1367,6 +1383,9 @@ with gizem_tab:
                 label="Tepe Noktalari",
                 zorder=3,
             )
+        axes_feat[0].plot([], [], color="#2ca02c", linewidth=2, label="Normal")
+        axes_feat[0].plot([], [], color="#1f77b4", linewidth=2, label="Mild")
+        axes_feat[0].plot([], [], color="#d62728", linewidth=2, label="Severe")
         if len(valley_indices) > 0:
             axes_feat[0].scatter(
                 x_for_plot[valley_indices],
@@ -1385,7 +1404,6 @@ with gizem_tab:
             change_points = np.where(np.diff(encoded_labels) != 0)[0] + 1
             segment_starts = np.r_[0, change_points]
             segment_ends = np.r_[change_points, len(encoded_labels)]
-            class_colors = {0: "#2ca02c", 1: "#1f77b4", 2: "#d62728"}
             for start_idx, end_idx in zip(segment_starts, segment_ends):
                 if end_idx - start_idx <= 0:
                     continue
