@@ -312,14 +312,6 @@ def show_results(model_name, test_accuracy, test_loss, window_count, history, cm
     st.pyplot(plot_history(history, model_name))
     st.pyplot(plot_confusion_matrix(cm, encoder.classes_, f"{model_name} Confusion Matrix"))
 
-    report = classification_report(
-        y_test,
-        y_pred,
-        target_names=encoder.classes_,
-        output_dict=True,
-        zero_division=0,
-    )
-    st.dataframe(pd.DataFrame(report).transpose(), use_container_width=True)
 
 
 def compute_best_epoch(history):
@@ -414,14 +406,6 @@ def show_cnn_results(test_accuracy, test_loss, window_count, best_epoch, macro_f
 
     st.pyplot(plot_confusion_matrix(cm, encoder.classes_, "1D-CNN Confusion Matrix"))
 
-    report = classification_report(
-        y_test,
-        y_pred,
-        target_names=encoder.classes_,
-        output_dict=True,
-        zero_division=0,
-    )
-    st.dataframe(pd.DataFrame(report).transpose(), use_container_width=True)
 
 
 st.title("FBG Sensör Verisi ile LSTM + CNN Hasar Tespiti Dashboard")
