@@ -436,6 +436,7 @@ uploaded_file = None
 if data_mode == "Makine öğrenimi için yeni veri yükle":
     uploaded_file = st.sidebar.file_uploader("Ham veri CSV yükle", type=["csv"])
     st.sidebar.caption("Ham veri formatı: time, delta_lambda_noisy (opsiyonel: delta_lambda_simulink, label)")
+    st.sidebar.info("Not: S?tun s?ras? ?nerisi -> 1) time, 2) fbg signal (delta_lambda_noisy), 3) label.")
 
 try:
     if data_mode == "Makine öğrenimi için yeni veri yükle":
