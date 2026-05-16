@@ -1322,9 +1322,33 @@ with gizem_tab:
         else:
             peak_indices = np.array([], dtype=int)
 
-        label_order = sorted(labels_as_text.unique().tolist())
-        label_map = {name: idx for idx, name in enumerate(label_order)}
-        encoded_labels = labels_as_text.map(label_map).to_numpy()
+        # Sinyalin kendi davranışından canlı hasar sınıfı türet (etikete bağlı olmadan)
+        if len(signal_for_plot) >= 7:
+            valley_mask = (
+                (smoothed_signal[1:-1] < smoothed_signal[:-2])
+                & (smoothed_signal[1:-1] < smoothed_signal[2:])
+            )
+            valley_indices = np.where(valley_mask)[0] + 1
+            dynamic_valley_threshold = np.percentile(smoothed_signal, 25)
+            valley_indices = valley_indices[smoothed_signal[valley_indices] <= dynamic_valley_threshold]
+        else:
+            valley_indices = np.array([], dtype=int)
+
+        encoded_labels = np.ones(len(signal_for_plot), dtype=int)  # 1: mild_damage
+        peak_radius = max(3, len(signal_for_plot) // 80)
+        valley_radius = max(3, len(signal_for_plot) // 80)
+
+        for p_idx in peak_indices:
+            left = max(0, p_idx - peak_radius)
+            right = min(len(encoded_labels), p_idx + peak_radius + 1)
+            encoded_labels[left:right] = 2  # 2: severe_damage
+
+        for v_idx in valley_indices:
+            left = max(0, v_idx - valley_radius)
+            right = min(len(encoded_labels), v_idx + valley_radius + 1)
+            encoded_labels[left:right] = 0  # 0: normal
+
+        label_map = {"normal": 0, "mild_damage": 1, "severe_damage": 2}
 
         fig_feat, axes_feat = plt.subplots(2, 1, figsize=(11, 8), sharex=True)
         axes_feat[0].plot(x_for_plot, signal_for_plot, color="#1f77b4", linewidth=2, label="Sinyal")
@@ -1342,10 +1366,11 @@ with gizem_tab:
         axes_feat[0].grid(True, alpha=0.3)
         axes_feat[0].legend(loc="best")
 
-        axes_feat[1].scatter(x_axis, encoded_labels, s=20, color="#2a6fbb")
+        axes_feat[1].plot(x_for_plot, encoded_labels, color="#2a6fbb", linewidth=2)
+        axes_feat[1].scatter(x_for_plot, encoded_labels, s=16, color="#2a6fbb")
         axes_feat[1].set_title("Encoded Damage Labels")
-        axes_feat[1].set_yticks(list(label_map.values()))
-        axes_feat[1].set_yticklabels(list(label_map.keys()))
+        axes_feat[1].set_yticks([0, 1, 2])
+        axes_feat[1].set_yticklabels(["Normal", "Mild", "Severe"])
         axes_feat[1].set_ylabel("Damage Class")
         axes_feat[1].set_xlabel("Time")
         axes_feat[1].grid(True, alpha=0.3)
