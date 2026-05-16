@@ -1294,104 +1294,50 @@ with gizem_tab:
         x_for_plot = np.asarray(x_axis)[valid_signal]
         signal_for_plot = signal_values[valid_signal]
 
-        if len(signal_for_plot) >= 7:
-            smooth_window = max(5, int(len(signal_for_plot) * 0.01))
-            if smooth_window % 2 == 0:
-                smooth_window += 1
-            kernel = np.ones(smooth_window, dtype=float) / smooth_window
-            smoothed_signal = np.convolve(signal_for_plot, kernel, mode="same")
-
-            local_window = max(8, len(smoothed_signal) // 25)
-            min_distance = max(10, len(smoothed_signal) // 18)
-            signal_span = max(float(np.nanmax(smoothed_signal) - np.nanmin(smoothed_signal)), 1e-9)
-            prominence_threshold = 0.10 * signal_span
-
+        # MATLAB (gizem/untitled10.m) mant???na yak?n tepe bulma:
+        # MinPeakProminence=0.15, MinPeakDistance=30 (time birimi)
+        if len(signal_for_plot) >= 3:
             peak_candidate_mask = (
-                (smoothed_signal[1:-1] > smoothed_signal[:-2])
-                & (smoothed_signal[1:-1] > smoothed_signal[2:])
+                (signal_for_plot[1:-1] > signal_for_plot[:-2])
+                & (signal_for_plot[1:-1] > signal_for_plot[2:])
             )
             peak_candidates = np.where(peak_candidate_mask)[0] + 1
-            valid_peak_candidates = []
+
+            peak_prominence_threshold = 0.15
+            valid_peaks = []
             for idx in peak_candidates:
-                left = max(0, idx - local_window)
-                right = min(len(smoothed_signal), idx + local_window + 1)
-                local_base = max(
-                    np.min(smoothed_signal[left:idx]) if idx > left else smoothed_signal[idx],
-                    np.min(smoothed_signal[idx + 1:right]) if idx + 1 < right else smoothed_signal[idx],
-                )
-                prominence = smoothed_signal[idx] - local_base
-                if prominence >= prominence_threshold:
-                    valid_peak_candidates.append(int(idx))
+                prominence = signal_for_plot[idx] - max(signal_for_plot[idx - 1], signal_for_plot[idx + 1])
+                if prominence >= peak_prominence_threshold:
+                    valid_peaks.append(int(idx))
 
-            valid_peak_candidates = sorted(valid_peak_candidates, key=lambda i: smoothed_signal[i], reverse=True)
+            min_peak_distance_time = 30.0
             selected_peaks = []
-            for idx in valid_peak_candidates:
-                if all(abs(idx - kept) >= min_distance for kept in selected_peaks):
+            for idx in valid_peaks:
+                if not selected_peaks:
                     selected_peaks.append(idx)
-            peak_indices = np.array(sorted(selected_peaks), dtype=int)
-
-            valley_candidate_mask = (
-                (smoothed_signal[1:-1] < smoothed_signal[:-2])
-                & (smoothed_signal[1:-1] < smoothed_signal[2:])
-            )
-            valley_candidates = np.where(valley_candidate_mask)[0] + 1
-            valid_valley_candidates = []
-            for idx in valley_candidates:
-                left = max(0, idx - local_window)
-                right = min(len(smoothed_signal), idx + local_window + 1)
-                local_ceil = min(
-                    np.max(smoothed_signal[left:idx]) if idx > left else smoothed_signal[idx],
-                    np.max(smoothed_signal[idx + 1:right]) if idx + 1 < right else smoothed_signal[idx],
-                )
-                prominence = local_ceil - smoothed_signal[idx]
-                if prominence >= prominence_threshold:
-                    valid_valley_candidates.append(int(idx))
-
-            valid_valley_candidates = sorted(valid_valley_candidates, key=lambda i: smoothed_signal[i])
-            selected_valleys = []
-            for idx in valid_valley_candidates:
-                if all(abs(idx - kept) >= min_distance for kept in selected_valleys):
-                    selected_valleys.append(idx)
-            valley_indices = np.array(sorted(selected_valleys), dtype=int)
+                    continue
+                if abs(x_for_plot[idx] - x_for_plot[selected_peaks[-1]]) >= min_peak_distance_time:
+                    selected_peaks.append(idx)
+                elif signal_for_plot[idx] > signal_for_plot[selected_peaks[-1]]:
+                    selected_peaks[-1] = idx
+            peak_indices = np.array(selected_peaks, dtype=int)
         else:
-            smoothed_signal = signal_for_plot.copy()
             peak_indices = np.array([], dtype=int)
-            valley_indices = np.array([], dtype=int)
 
-        encoded_labels = np.ones(len(signal_for_plot), dtype=int)  # 1: mild_damage
-        peak_radius = max(3, len(signal_for_plot) // 80)
-        valley_radius = max(3, len(signal_for_plot) // 80)
-
-        for p_idx in peak_indices:
-            left = max(0, p_idx - peak_radius)
-            right = min(len(encoded_labels), p_idx + peak_radius + 1)
-            encoded_labels[left:right] = 2  # 2: severe_damage
-
-        for v_idx in valley_indices:
-            left = max(0, v_idx - valley_radius)
-            right = min(len(encoded_labels), v_idx + valley_radius + 1)
-            encoded_labels[left:right] = 0  # 0: normal
-
-        label_map = {"normal": 0, "mild_damage": 1, "severe_damage": 2}
+        label_series = gizem_labeled_df["label"].astype(str).str.strip().str.lower()
+        label_code_map = {"normal": 0, "mild_damage": 1, "severe_damage": 2}
+        encoded_labels = label_series.map(label_code_map).fillna(1).to_numpy(dtype=int)
+        encoded_labels = encoded_labels[valid_signal]
 
         fig_feat, axes_feat = plt.subplots(2, 1, figsize=(11, 8), sharex=True)
-        axes_feat[0].plot(x_for_plot, signal_for_plot, color="#1f77b4", linewidth=2, label="Sinyal")
+        axes_feat[0].plot(x_for_plot, signal_for_plot, color="#1f77b4", linewidth=1.8, label="Filtrelenmis Sinyal")
         if len(peak_indices) > 0:
             axes_feat[0].scatter(
                 x_for_plot[peak_indices],
                 signal_for_plot[peak_indices],
-                color="#ff7f0e",
-                s=36,
-                label="Tepe noktaları",
-                zorder=3,
-            )
-        if len(valley_indices) > 0:
-            axes_feat[0].scatter(
-                x_for_plot[valley_indices],
-                signal_for_plot[valley_indices],
-                color="#2ca02c",
-                s=36,
-                label="Cukur noktaları",
+                color="red",
+                s=34,
+                label="Tepe Noktalari",
                 zorder=3,
             )
         axes_feat[0].set_title("Peak Detection")
@@ -1399,8 +1345,7 @@ with gizem_tab:
         axes_feat[0].grid(True, alpha=0.3)
         axes_feat[0].legend(loc="best")
 
-        axes_feat[1].plot(x_for_plot, encoded_labels, color="#2a6fbb", linewidth=2)
-        axes_feat[1].scatter(x_for_plot, encoded_labels, s=16, color="#2a6fbb")
+        axes_feat[1].plot(x_for_plot, encoded_labels, color="#1f77b4", linewidth=2)
         axes_feat[1].set_title("Encoded Damage Labels")
         axes_feat[1].set_yticks([0, 1, 2])
         axes_feat[1].set_yticklabels(["Normal", "Mild", "Severe"])
