@@ -558,16 +558,17 @@ else:
 
 
 with overview_tab:
-    preview_rows = st.slider("Gosterilecek satir sayisi", 5, min(len(model_training_df), 100), 20)
-    max_start = max(len(model_training_df) - preview_rows, 0)
+    overview_df = raw_uploaded_df.copy() if is_uploaded_mode and raw_uploaded_df is not None else df.copy()
+    preview_rows = st.slider("Gosterilecek satir sayisi", 5, min(len(overview_df), 100), 20)
+    max_start = max(len(overview_df) - preview_rows, 0)
     start_row = st.slider("Baslangic satiri", 0, max_start, 0)
-    end_row = min(start_row + preview_rows, len(model_training_df))
-    st.caption(f"Gosterilen aralik: {start_row} - {end_row - 1} / Toplam satir: {len(model_training_df)}")
-    st.dataframe(model_training_df.iloc[start_row:end_row], use_container_width=True)
+    end_row = min(start_row + preview_rows, len(overview_df))
+    st.caption(f"Gosterilen aralik: {start_row} - {end_row - 1} / Toplam satir: {len(overview_df)}")
+    st.dataframe(overview_df.iloc[start_row:end_row], use_container_width=True)
 
 
     st.subheader("Sinyal Grafigi")
-    overview_graph_df = df if is_uploaded_mode else (simay_generated_df if simay_generated_df is not None else df)
+    overview_graph_df = overview_df
     overview_feature_candidates = ["delta_lambda_noisy", "delta_lambda_simulink", feature_column]
     overview_feature = next((column for column in overview_feature_candidates if column in overview_graph_df.columns), None)
     if overview_feature is not None:
@@ -578,7 +579,7 @@ with overview_tab:
 
     if show_label_distribution:
         st.subheader("Etiket Dağılımı")
-        label_counts = model_training_df["label"].value_counts()
+        label_counts = overview_df["label"].value_counts()
         fig, ax = plt.subplots(figsize=(6, 4))
         ax.bar(label_counts.index, label_counts.values)
         ax.set_xlabel("Etiket")
