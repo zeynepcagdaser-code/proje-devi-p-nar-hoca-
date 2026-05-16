@@ -1285,15 +1285,55 @@ with gizem_tab:
         st.success("Özellik çıkarımı tamamlandı.")
         st.write("Global özellik tablosu:")
         st.dataframe(gizem_feature_table, use_container_width=True)
-        feature_plot_df = gizem_feature_table.transpose().reset_index()
-        feature_plot_df.columns = ["Ozellik", "Deger"]
-        fig_feat, ax_feat = plt.subplots(figsize=(10, 4))
-        ax_feat.plot(feature_plot_df["Ozellik"], feature_plot_df["Deger"], marker="o", linewidth=2)
-        ax_feat.set_title("Ozellik Dagilimi")
-        ax_feat.set_xlabel("Ozellik")
-        ax_feat.set_ylabel("Deger")
-        ax_feat.tick_params(axis="x", rotation=45)
-        ax_feat.grid(axis="y")
+
+        signal_col = "delta_lambda_filtered" if "delta_lambda_filtered" in gizem_labeled_df.columns else feature_column
+        x_axis = gizem_labeled_df["time"] if "time" in gizem_labeled_df.columns else np.arange(len(gizem_labeled_df))
+        signal_values = gizem_labeled_df[signal_col].to_numpy(dtype=float)
+        labels_as_text = gizem_labeled_df["label"].astype(str).fillna("unknown")
+
+        valid_signal = np.isfinite(signal_values)
+        x_for_plot = np.asarray(x_axis)[valid_signal]
+        signal_for_plot = signal_values[valid_signal]
+
+        if len(signal_for_plot) >= 3:
+            peak_mask = (
+                (signal_for_plot[1:-1] > signal_for_plot[:-2])
+                & (signal_for_plot[1:-1] > signal_for_plot[2:])
+            )
+            peak_indices = np.where(peak_mask)[0] + 1
+            if len(peak_indices) > 30:
+                peak_indices = peak_indices[:30]
+        else:
+            peak_indices = np.array([], dtype=int)
+
+        label_order = sorted(labels_as_text.unique().tolist())
+        label_map = {name: idx for idx, name in enumerate(label_order)}
+        encoded_labels = labels_as_text.map(label_map).to_numpy()
+
+        fig_feat, axes_feat = plt.subplots(2, 1, figsize=(11, 8), sharex=True)
+        axes_feat[0].plot(x_for_plot, signal_for_plot, color="#1f77b4", linewidth=2, label="Sinyal")
+        if len(peak_indices) > 0:
+            axes_feat[0].scatter(
+                x_for_plot[peak_indices],
+                signal_for_plot[peak_indices],
+                color="#ff7f0e",
+                s=36,
+                label="Tepe noktaları",
+                zorder=3,
+            )
+        axes_feat[0].set_title("Peak Detection")
+        axes_feat[0].set_ylabel("Delta Lambda")
+        axes_feat[0].grid(True, alpha=0.3)
+        axes_feat[0].legend(loc="best")
+
+        axes_feat[1].scatter(x_axis, encoded_labels, s=20, color="#2a6fbb")
+        axes_feat[1].set_title("Encoded Damage Labels")
+        axes_feat[1].set_yticks(list(label_map.values()))
+        axes_feat[1].set_yticklabels(list(label_map.keys()))
+        axes_feat[1].set_ylabel("Damage Class")
+        axes_feat[1].set_xlabel("Time")
+        axes_feat[1].grid(True, alpha=0.3)
+        plt.tight_layout()
         st.pyplot(fig_feat)
 
         st.write("Etiketlenmis veri:")
