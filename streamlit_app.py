@@ -1289,7 +1289,6 @@ with gizem_tab:
         signal_col = "delta_lambda_filtered" if "delta_lambda_filtered" in gizem_labeled_df.columns else feature_column
         x_axis = gizem_labeled_df["time"] if "time" in gizem_labeled_df.columns else np.arange(len(gizem_labeled_df))
         signal_values = gizem_labeled_df[signal_col].to_numpy(dtype=float)
-        labels_as_text = gizem_labeled_df["label"].astype(str).fillna("unknown")
 
         valid_signal = np.isfinite(signal_values)
         x_for_plot = np.asarray(x_axis)[valid_signal]
@@ -1302,36 +1301,61 @@ with gizem_tab:
             kernel = np.ones(smooth_window, dtype=float) / smooth_window
             smoothed_signal = np.convolve(signal_for_plot, kernel, mode="same")
 
-            candidate_mask = (
+            local_window = max(8, len(smoothed_signal) // 25)
+            min_distance = max(10, len(smoothed_signal) // 18)
+            signal_span = max(float(np.nanmax(smoothed_signal) - np.nanmin(smoothed_signal)), 1e-9)
+            prominence_threshold = 0.10 * signal_span
+
+            peak_candidate_mask = (
                 (smoothed_signal[1:-1] > smoothed_signal[:-2])
                 & (smoothed_signal[1:-1] > smoothed_signal[2:])
             )
-            candidate_indices = np.where(candidate_mask)[0] + 1
+            peak_candidates = np.where(peak_candidate_mask)[0] + 1
+            valid_peak_candidates = []
+            for idx in peak_candidates:
+                left = max(0, idx - local_window)
+                right = min(len(smoothed_signal), idx + local_window + 1)
+                local_base = max(
+                    np.min(smoothed_signal[left:idx]) if idx > left else smoothed_signal[idx],
+                    np.min(smoothed_signal[idx + 1:right]) if idx + 1 < right else smoothed_signal[idx],
+                )
+                prominence = smoothed_signal[idx] - local_base
+                if prominence >= prominence_threshold:
+                    valid_peak_candidates.append(int(idx))
 
-            dynamic_threshold = np.percentile(smoothed_signal, 75)
-            candidate_indices = candidate_indices[smoothed_signal[candidate_indices] >= dynamic_threshold]
-
-            min_distance = max(8, len(smoothed_signal) // 20)
+            valid_peak_candidates = sorted(valid_peak_candidates, key=lambda i: smoothed_signal[i], reverse=True)
             selected_peaks = []
-            for idx in candidate_indices:
-                if not selected_peaks or (idx - selected_peaks[-1]) >= min_distance:
-                    selected_peaks.append(int(idx))
-                elif smoothed_signal[idx] > smoothed_signal[selected_peaks[-1]]:
-                    selected_peaks[-1] = int(idx)
-            peak_indices = np.array(selected_peaks, dtype=int)
-        else:
-            peak_indices = np.array([], dtype=int)
+            for idx in valid_peak_candidates:
+                if all(abs(idx - kept) >= min_distance for kept in selected_peaks):
+                    selected_peaks.append(idx)
+            peak_indices = np.array(sorted(selected_peaks), dtype=int)
 
-        # Sinyalin kendi davranışından canlı hasar sınıfı türet (etikete bağlı olmadan)
-        if len(signal_for_plot) >= 7:
-            valley_mask = (
+            valley_candidate_mask = (
                 (smoothed_signal[1:-1] < smoothed_signal[:-2])
                 & (smoothed_signal[1:-1] < smoothed_signal[2:])
             )
-            valley_indices = np.where(valley_mask)[0] + 1
-            dynamic_valley_threshold = np.percentile(smoothed_signal, 25)
-            valley_indices = valley_indices[smoothed_signal[valley_indices] <= dynamic_valley_threshold]
+            valley_candidates = np.where(valley_candidate_mask)[0] + 1
+            valid_valley_candidates = []
+            for idx in valley_candidates:
+                left = max(0, idx - local_window)
+                right = min(len(smoothed_signal), idx + local_window + 1)
+                local_ceil = min(
+                    np.max(smoothed_signal[left:idx]) if idx > left else smoothed_signal[idx],
+                    np.max(smoothed_signal[idx + 1:right]) if idx + 1 < right else smoothed_signal[idx],
+                )
+                prominence = local_ceil - smoothed_signal[idx]
+                if prominence >= prominence_threshold:
+                    valid_valley_candidates.append(int(idx))
+
+            valid_valley_candidates = sorted(valid_valley_candidates, key=lambda i: smoothed_signal[i])
+            selected_valleys = []
+            for idx in valid_valley_candidates:
+                if all(abs(idx - kept) >= min_distance for kept in selected_valleys):
+                    selected_valleys.append(idx)
+            valley_indices = np.array(sorted(selected_valleys), dtype=int)
         else:
+            smoothed_signal = signal_for_plot.copy()
+            peak_indices = np.array([], dtype=int)
             valley_indices = np.array([], dtype=int)
 
         encoded_labels = np.ones(len(signal_for_plot), dtype=int)  # 1: mild_damage
@@ -1359,6 +1383,15 @@ with gizem_tab:
                 color="#ff7f0e",
                 s=36,
                 label="Tepe noktaları",
+                zorder=3,
+            )
+        if len(valley_indices) > 0:
+            axes_feat[0].scatter(
+                x_for_plot[valley_indices],
+                signal_for_plot[valley_indices],
+                color="#2ca02c",
+                s=36,
+                label="Cukur noktaları",
                 zorder=3,
             )
         axes_feat[0].set_title("Peak Detection")
