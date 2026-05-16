@@ -1381,13 +1381,23 @@ with gizem_tab:
         axes_feat[0].grid(True, alpha=0.3)
         axes_feat[0].legend(loc="best")
 
-        axes_feat[1].plot(
-            x_for_plot,
-            encoded_labels,
-            color="#1f77b4",
-            linewidth=1.2,
-            drawstyle="steps-post",
-        )
+        if len(encoded_labels) > 0:
+            change_points = np.where(np.diff(encoded_labels) != 0)[0] + 1
+            segment_starts = np.r_[0, change_points]
+            segment_ends = np.r_[change_points, len(encoded_labels)]
+            for start_idx, end_idx in zip(segment_starts, segment_ends):
+                if end_idx - start_idx <= 0:
+                    continue
+                y_val = encoded_labels[start_idx]
+                x_start = x_for_plot[start_idx]
+                x_end = x_for_plot[end_idx - 1]
+                axes_feat[1].hlines(
+                    y=y_val,
+                    xmin=x_start,
+                    xmax=x_end,
+                    colors="#1f77b4",
+                    linewidth=2.2,
+                )
         axes_feat[1].set_title("Encoded Damage Labels")
         axes_feat[1].set_yticks([0, 1, 2])
         axes_feat[1].set_yticklabels(["Normal", "Mild", "Severe"])
